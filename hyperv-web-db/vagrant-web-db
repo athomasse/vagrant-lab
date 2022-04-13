@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  #
+  # Vagrant deployment box
+  #
+  config.vm.box = "generic/ubuntu2010"
+
+  # private key ~/.vagrant.d/insecure_private_key
+  config.ssh.insert_key = false
+
+  #
+  # Share an additional folder to the guest VM.
+  #
+  #config.vm.synced_folder "./data", "/vagrant_data"
+
+  #
+  # Hyper-V provider-specific configuration for virtual machine deployment
+  #
+  config.vm.provider "hyperv" do |hv|
+    # linked clones for faster deployment
+    hv.linked_clone = true
+    # Number of virtual cpu's
+    hv.cpus = 2
+    # Amount of memory on the VM:
+    hv.memory = 1024
+    # max memory when using dynamic memory
+    hv.maxmemory = 2048
+    # VLAN ID for network interface
+    #hv.vlan_id = ##
+    # Enable virtualization extensions for the virtual CPUs
+    enable_virtualization_extensions = true
+  end
+
+  #
+  # define virtual machines configuration for deployment
+  # the statuic IP's are not working (yet) in Hyper-v
+  #
+  config.vm.define "web1" do |web|
+    web.vm.hostname = "web1.test"
+    web.vm.network "public_network", ip: "192.168.1.201", bridge: "vSwitch01"
+  end
+
+  config.vm.define "web2" do |web|
+    web.vm.hostname = "web2.test"
+    web.vm.network "public_network", ip: "192.168.1.202", bridge: "vSwitch01"
+  end
+
+  config.vm.define "db1" do |db1|
+    db1.vm.hostname = "web2.test"
+    db1.vm.network "public_network", ip: "192.168.1.203", bridge: "vSwitch01"
+  end
+end
